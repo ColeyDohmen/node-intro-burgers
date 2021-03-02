@@ -8,7 +8,9 @@ export class BurgersController extends BaseController {
     super("api/burgers");
     this.router
       .get("", this.getAll)
-      .post("", this.create);
+      .post("", this.create)
+      .delete("/:id", this.delete)
+      .put("/:id", this.edit)
   }
   async getAll(req, res, next) {
     try {
@@ -18,11 +20,35 @@ export class BurgersController extends BaseController {
       next(error);
     }
   }
+
+  async edit (req, res, next){
+    try{
+      let editedBurger = req.body
+      const burger = burgersService.edit(editedBurger, req.params.id)
+      res.send(burger)
+    
+    }
+    catch (error){
+      next(error)
+    }
+  }
   async create(req, res, next) {
     try {
-      res.send(req.body);
+      let rawBurger = req.body 
+      const burger = burgersService.create(rawBurger)
+      res.status(201).send({data:burger})
     } catch (error) {
       next(error);
+    }
+  }
+
+  async delete(req, res, next) {
+    try {
+      const id = req.params.id
+      burgersService.delete(id)
+      res.send("DELETED")
+    } catch (error) {
+      next(error)
     }
   }
 }
